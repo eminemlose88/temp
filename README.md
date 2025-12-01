@@ -60,6 +60,8 @@ git branch -M main
 ### 环境变量
 - `KV_REST_API_URL`、`KV_REST_API_TOKEN`：Vercel KV 提供
 - `ADMIN_API_KEY`：自定义管理密钥，用于确认到账接口
+ - `REDIS_URL` 或以下分解变量：
+   - `REDIS_HOST`、`REDIS_PORT`、`REDIS_USERNAME`、`REDIS_PASSWORD`、`REDIS_TLS=true`
 
 ### 初始化本地环境变量
 ```bash
@@ -79,8 +81,25 @@ vercel env pull .env.development.local
 - `GET  /api/tips/by-user?userId=...` 获取某用户订单与合计
 - `GET  /api/tips/summary` 总账与用户数
 - `GET  /api/tips/status?id=...` 查询单笔状态
+ - `GET  /api/redis/test` 通过 Redis Client 读写 `foo` 验证连接
 
 ### 安全
 - 管理端操作通过 `ADMIN_API_KEY` 鉴权，前端仅在 `admin.html` 中使用。
 - 金额与用户的关联以 `tip:<id>` 存储，用户索引保存在 `user_tips:<userId>`，总账累加在 `tips:total`。
+
+## 使用 Redis Client 连接（按官方示例）
+
+本地脚本（需要 Node 18+）：
+
+```bash
+npm run redis:test
+```
+
+仅设置一个环境变量（与 node-redis 官方推荐一致）：
+
+```
+REDIS_URL=rediss://default:<PASSWORD>@<HOST>:<PORT>
+```
+
+部署后在浏览器访问 `/api/redis/test`，返回 `{"ok":true,"result":"bar"}` 即表示连通。
 

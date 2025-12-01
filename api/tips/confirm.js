@@ -1,15 +1,16 @@
-import { kv, ok, bad, requireAdmin } from '../util.js'
+import { getRedis } from '../_lib/redis.js'
+import { requireAdmin } from '../_lib/auth.js'
 
 export default async function handler(req,res){
-  if(req.method!=='POST') return bad(res,'invalid method')
+  if(req.method!=='POST') return res.status(405).json({ok:false,error:'method'})
   if(!requireAdmin(req,res)) return
   const {id,status}=req.body||{}
-  if(!id) return bad(res,'missing id')
-  const tip=await kv.get(`tip:${id}`)
-  if(!tip) return bad(res,'not found')
-  tip.status=status||'completed'
-  tip.confirmedAt=Date.now()
-  await kv.set(`tip:${id}`,tip)
-  ok(res,{id,status:tip.status})
+  if(!id) return res.status(400).json({ok:false,error:'missing id'})
+  const r=await getRedis()
+  const exists = await r.exists(`tip:${id}`)
+  if(!exists) return res.status(404).json({ok:false,error:'not found'})
+  const fields = { status: status||'completed', confirmedAt: String(Date.now()) }
+  await r.hSet(`tip:${id}`, fields)
+  res.status(200).json({ok:true,data:{id,status:fields.status}})
 }
 

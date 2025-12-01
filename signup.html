@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>注册</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <h1 class="title">注册账户</h1>
+      <form class="form" id="signup-form">
+        <div class="field">
+          <label for="account">账号（邮箱/手机号）</label>
+          <input id="account" type="text" required>
+        </div>
+        <div class="field">
+          <label for="name">昵称</label>
+          <input id="name" type="text">
+        </div>
+        <div class="field">
+          <label for="spass">密码</label>
+          <input id="spass" type="password" required>
+        </div>
+        <div id="s-error" class="error"></div>
+        <button class="btn" type="submit">注册</button>
+      </form>
+      <div class="divider"><a class="link" href="index.html">已有账号？去登录</a></div>
+    </div>
+  </div>
+  <script>
+    const f=document.getElementById('signup-form')
+    const err=document.getElementById('s-error')
+    f.addEventListener('submit',async e=>{
+      e.preventDefault();err.textContent=''
+      const account=document.getElementById('account').value.trim()
+      const name=document.getElementById('name').value.trim()
+      const password=document.getElementById('spass').value
+      try{
+        const r = await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({account,name,password})})
+        const j = await r.json()
+        if(!j.ok){err.textContent=j.error||'注册失败';return}
+        alert('注册成功，请登录');location.href='index.html'
+      }catch(e){err.textContent='注册失败'}
+    })
+  </script>
+</body>
+</html>
+

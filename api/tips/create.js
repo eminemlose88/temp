@@ -1,15 +1,19 @@
-import { kv, ok, bad } from '../util.js'
+import { getSessionUserId } from '../_lib/auth.js'
+import { getRedis } from '../_lib/redis.js'
 
 export default async function handler(req,res){
-  if(req.method!=='POST') return bad(res,'invalid method')
-  const {userId,amount,currency,method,reference}=req.body||{}
-  if(!userId||!amount||!currency||!method) return bad(res,'missing fields')
-  const id=Math.random().toString(36).slice(2,10)
+  if(req.method!=='POST') return res.status(405).json({ok:false,error:'method'})
+  const uid = await getSessionUserId(req)
+  if(!uid) return res.status(401).json({ok:false,error:'unauthorized'})
+  const {amount,currency='KRW',method='unknown',reference=''}=req.body||{}
+  if(!amount) return res.status(400).json({ok:false,error:'missing amount'})
+  const r=await getRedis()
+  const id = await r.incr('tip:seq')
   const time=Date.now()
-  const tip={id,userId,amount:Number(amount),currency,method,reference:reference||'',status:'pending',createdAt:time}
-  await kv.set(`tip:${id}`,tip)
-  await kv.zadd(`user_tips:${userId}`,{score:time,member:id})
-  await kv.incrby('tips:total',Number(amount))
-  ok(res,{id})
+  const tip={id:String(id),userId:String(uid),amount:Number(amount),currency,method,reference,status:'pending',createdAt:time}
+  await r.hSet(`tip:${id}`,Object.fromEntries(Object.entries(tip).map(([k,v])=>[k,String(v)])))
+  await r.zAdd(`user:${uid}:tips`,[{score:time, value:String(id)}])
+  await r.incrBy('tips:total', Number(amount))
+  res.status(200).json({ok:true,data:{id:String(id)}})
 }
 

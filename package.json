@@ -5,10 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "python -m http.server 5173",
-    "vercel:env:pull": "vercel env pull .env.development.local"
+    "vercel:env:pull": "vercel env pull .env.development.local",
+    "redis:test": "node scripts/redis-test.mjs"
   },
   "dependencies": {
-    "@vercel/kv": "^1.0.0"
+    "@vercel/kv": "^1.0.0",
+    "redis": "^4.6.14",
+    "bcryptjs": "^2.4.3"
   }
 }
 

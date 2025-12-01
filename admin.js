@@ -34,8 +34,8 @@ qBtn.onclick=async()=>{
   if(!id) return
   const data=await api(`/api/tips/by-user?userId=${encodeURIComponent(id)}`)
   if(!data.ok){uRes.textContent='查询失败';return}
-  const tips=data.data.tips||[]
-  const total=data.data.total||0
+  const tips=(data.data&&data.data.tips)||[]
+  const total=(data.data&&data.data.total)||0
   const list=document.createElement('div')
   list.className='menu-list'
   tips.forEach(t=>{const d=document.createElement('div');d.className='menu-item';d.textContent=`${t.id} · ${t.amount} ${t.currency||'KRW'} · ${t.method} · ${t.status}`;list.append(d)})

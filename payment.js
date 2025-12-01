@@ -16,14 +16,23 @@ function initDepositPage(){
   const err=document.getElementById('deposit-error')
   const recent=document.getElementById('recent-deposits')
   renderRecentDeposits(recent)
-  form.addEventListener('submit',e=>{
+  form.addEventListener('submit',async e=>{
     e.preventDefault();err.textContent=''
     const method=document.querySelector('input[name="pay"]:checked').value
     const amount=parseInt(document.getElementById('amount').value,10)
     if(!amount||amount<1000){err.textContent='请输入不低于 1000 的金额';return}
-    const rec={id:id(),time:now(),amount,method,status:'Pending'}
-    addDeposit(rec)
-    setTimeout(()=>{rec.status='Completed';addDeposit(rec);renderRecentDeposits(recent);alert('入金成功：'+money(amount)+' KRW')},800)
+    const token=localStorage.getItem('auth_token')
+    try{
+      const r=await fetch('/api/tips/create',{method:'POST',headers:{'Content-Type':'application/json',Authorization: token?('Bearer '+token):undefined},body:JSON.stringify({amount,method,currency:'KRW'})})
+      const j=await r.json()
+      if(j&&j.ok){alert('入金记录已创建');renderRecentDeposits(recent)} else {
+        const rec={id:id(),time:now(),amount,method,status:'Pending'}
+        addDeposit(rec);setTimeout(()=>{rec.status='Completed';addDeposit(rec);renderRecentDeposits(recent);alert('入金成功：'+money(amount)+' KRW')},800)
+      }
+    }catch(_){
+      const rec={id:id(),time:now(),amount,method,status:'Pending'}
+      addDeposit(rec);setTimeout(()=>{rec.status='Completed';addDeposit(rec);renderRecentDeposits(recent);alert('入金成功：'+money(amount)+' KRW')},800)
+    }
   })
 }
 
@@ -59,12 +68,18 @@ function initRecordsPage(){
   const btnD=document.getElementById('btn-deposits')
   const btnW=document.getElementById('btn-withdraws')
   const list=document.getElementById('list')
-  function renderDeposits(){
+  async function renderDeposits(){
     btnD.classList.add('active');btnW.classList.remove('active')
     list.innerHTML=''
-    read('deposit_records').forEach(r=>{
+    const token=localStorage.getItem('auth_token')
+    let items=[]
+    if(token){
+      try{const r=await fetch('/api/tips/my',{headers:{Authorization:'Bearer '+token}});const j=await r.json();if(j&&j.ok){items=j.data.tips||[]}}catch(_){items=[]}
+    }
+    (items.length?items:read('deposit_records')).forEach(r=>{
       const item=document.createElement('div');item.className='menu-item'
-      item.textContent=`[入金] #${r.id} · ${money(r.amount)} KRW · ${r.method.toUpperCase()} · ${new Date(r.time).toLocaleString()} · ${r.status}`
+      const when=r.time?new Date(r.time).toLocaleString():''
+      item.textContent=`[入金] #${r.id} · ${money(r.amount)} KRW · ${(r.method||'').toString().toUpperCase()} · ${when} · ${r.status||''}`
       list.append(item)
     })
   }
@@ -81,4 +96,3 @@ function initRecordsPage(){
   btnW.addEventListener('click',renderWithdraws)
   renderDeposits()
 }
-
