@@ -15,11 +15,14 @@ export async function supabasePasswordSignIn(email, password){
   let data
   try{ data = await res.json() }catch(_){ data = null }
   if(!res.ok){
-    let msg = (data && (data.error_description||data.error)) || `supabase error ${res.status}`
-    if(!data){
+    let msg = `supabase error ${res.status}`
+    const pick = d => d?.error_description || d?.message || d?.msg || d?.error || d?.code
+    const m1 = data ? pick(data) : null
+    if(m1) msg = m1
+    if(!m1){
       try{
         const txt = await res.text()
-        if(txt) msg = `${msg}: ${txt.slice(0,200)}`
+        if(txt) msg = txt.slice(0,200)
       }catch(_){/* ignore */}
     }
     throw new Error(msg)
