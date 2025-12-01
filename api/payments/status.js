@@ -7,6 +7,7 @@ export default async function handler(req,res){
   const r=await getRedis()
   const ids = await r.zRange(`user:${uid}:payments`,0,-1)
   const list = await Promise.all(ids.map(async id=>await r.hGetAll(`payment:${id}`)))
-  const total=list.reduce((s,t)=>s+Number(t.amount||0),0)
-  res.status(200).json({ok:true,data:{payments:list,total}})
+  const totalCompleted=list.filter(p=>String(p.status)==='succeeded').reduce((s,t)=>s+Number(t.amount||0),0)
+  const totalPending=list.filter(p=>String(p.status)!=='succeeded').reduce((s,t)=>s+Number(t.amount||0),0)
+  res.status(200).json({ok:true,data:{payments:list,totalCompleted,totalPending}})
 }

@@ -16,9 +16,13 @@ function initDepositPage(){
     const amount=parseInt(document.getElementById('amount').value,10)
     if(!amount||amount<1000){err.textContent='请输入不低于 1000 的金额';return}
     try{
-      const r=await fetch('/api/tips/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount,method,currency:'KRW'})})
+      const r=await fetch('/api/payments/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount,method,currency:'KRW'})})
       const j=await r.json()
-      if(j&&j.ok){alert('入金记录已创建');renderRecentDeposits(recent)} else { err.textContent=j.error||'创建失败' }
+      if(j&&j.ok){
+        const url = j.data?.provider?.redirectUrl
+        if(url){ location.href = url } else { alert('订单已创建，请前往支付'); }
+        renderRecentDeposits(recent)
+      } else { err.textContent=j.error||'创建失败' }
     }catch(e){ err.textContent='网络错误，请稍后重试' }
   })
 }
@@ -26,9 +30,9 @@ function initDepositPage(){
 async function renderRecentDeposits(container){
   container.innerHTML=''
   try{
-    const r=await fetch('/api/tips/my')
+    const r=await fetch('/api/payments/status')
     const j=await r.json()
-    const arr=(j&&j.ok&&j.data&&j.data.tips)||[]
+    const arr=(j&&j.ok&&j.data&&j.data.payments)||[]
     arr.slice(0,5).forEach(r=>{
       const line=document.createElement('div')
       line.className='menu-item'
@@ -52,9 +56,12 @@ function initWithdrawPage(){
     if(!bank||!holder||!account){err.textContent='请完整填写银行信息';return}
     try{
       const reference=JSON.stringify({bank,holder,account})
-      const r=await fetch('/api/tips/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount,method:'bank',currency:'KRW',reference})})
+      const r=await fetch('/api/payments/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount,method:'bank',currency:'KRW',reference})})
       const j=await r.json()
-      if(j&&j.ok){alert('出金申请已提交');} else {err.textContent=j.error||'提交失败'}
+      if(j&&j.ok){
+        const url = j.data?.provider?.redirectUrl
+        if(url){ location.href = url } else { alert('订单已创建，请前往支付'); }
+      } else {err.textContent=j.error||'提交失败'}
     }catch(_){err.textContent='网络错误，请稍后重试'}
   })
 }
@@ -67,7 +74,7 @@ function initRecordsPage(){
     btnD.classList.add('active');btnW.classList.remove('active')
     list.innerHTML=''
     let items=[]
-    try{const r=await fetch('/api/tips/my');const j=await r.json();if(j&&j.ok){items=j.data.tips||[]}}catch(_){items=[]}
+    try{const r=await fetch('/api/payments/status');const j=await r.json();if(j&&j.ok){items=j.data.payments||[]}}catch(_){items=[]}
     items.forEach(r=>{
       const item=document.createElement('div');item.className='menu-item'
       const when=r.createdAt?new Date(r.createdAt).toLocaleString():''
