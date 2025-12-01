@@ -1,13 +1,13 @@
 import { getRedis } from '../_lib/redis.js'
 import { createSession, setSessionCookie } from '../_lib/auth.js'
-import bcrypt from 'bcryptjs'
 import { supabasePasswordSignIn } from '../_lib/supabase.js'
 
 export default async function handler(req,res){
   if(req.method!=='POST') return res.status(405).json({ok:false,error:'method'})
   const {account,password}=req.body||{}
   if(!account||!password) return res.status(400).json({ok:false,error:'missing fields'})
-  const r=await getRedis()
+  let r
+  try{ r=await getRedis() }catch(e){ return res.status(503).json({ok:false,error:'service unavailable'}) }
   // 首次通过 Supabase 验证
   let sb
   try{
@@ -25,7 +25,9 @@ export default async function handler(req,res){
     uid=String(nid)
   }
   const ttlSec = 60*60*24*7
-  const token = await createSession({uid, sbAccess: sb.access_token, sbRefresh: sb.refresh_token, sbUserId: sb.user?.id||''}, ttlSec)
+  let token
+  try{ token = await createSession({uid, sbAccess: sb.access_token, sbRefresh: sb.refresh_token, sbUserId: sb.user?.id||''}, ttlSec) }
+  catch(e){ return res.status(503).json({ok:false,error:'service unavailable'}) }
   const data = await r.hGetAll(`user:${uid}`)
   const user = { id: String(uid), account: data.account, name: data.name||account, createdAt: Number(data.createdAt||0), sbUserId: sb.user?.id||'' }
   // 在 Redis 中缓存用户资料 10 分钟
