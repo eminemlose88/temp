@@ -9,9 +9,31 @@ export async function createSession(userIdOrPayload, ttlSec=60*10){
   return token
 }
 
-export async function getSessionUserId(req){
+function getAuthToken(req){
   const auth = req.headers['authorization']||''
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : ''
+  if(auth.startsWith('Bearer ')) return auth.slice(7)
+  const cookie = req.headers['cookie']||''
+  if(cookie){
+    const parts = cookie.split(';').map(s=>s.trim())
+    for(const p of parts){
+      if(p.startsWith('auth_token=')) return p.slice('auth_token='.length)
+    }
+  }
+  return ''
+}
+
+export function setSessionCookie(res, token, maxAgeSec){
+  const age = Number(maxAgeSec||0)
+  const cookie = `auth_token=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; ${age>0?`Max-Age=${age}`:'Session'}`
+  res.setHeader('Set-Cookie', cookie)
+}
+
+export function clearSessionCookie(res){
+  res.setHeader('Set-Cookie', 'auth_token=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0')
+}
+
+export async function getSessionUserId(req){
+  const token = getAuthToken(req)
   if(!token) return null
   const r = await getRedis()
   const raw = await r.get(`session:${token}`)
@@ -29,8 +51,7 @@ export function requireAdmin(req,res){
 }
 
 export async function getSession(req){
-  const auth = req.headers['authorization']||''
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : ''
+  const token = getAuthToken(req)
   if(!token) return null
   const r = await getRedis()
   const raw = await r.get(`session:${token}`)
@@ -39,8 +60,7 @@ export async function getSession(req){
 }
 
 export async function touchSession(req, ttlSec=60*10){
-  const auth = req.headers['authorization']||''
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : ''
+  const token = getAuthToken(req)
   if(!token) return false
   const r = await getRedis()
   const key = `session:${token}`

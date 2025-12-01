@@ -14,12 +14,24 @@ navItems.forEach(n=>n.addEventListener('click',()=>switchTab(n.dataset.tab)))
 
 function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
 
-function initUser(){
-  const name=sessionStorage.getItem('current_user')||'用户'
+async function initUser(){
   const pname=document.getElementById('pname')
   const pid=document.getElementById('pid')
-  if(pname)pname.textContent=name
+  try{
+    const r=await fetch('/api/auth/me')
+    const j=await r.json()
+    const name=(j&&j.ok&&j.data&&j.data.name)||'用户'
+    if(pname)pname.textContent=name
+  }catch(_){ if(pname)pname.textContent='用户' }
   if(pid)pid.textContent='NO.'+String(Math.floor(Math.random()*1e7)).padStart(7,'0')
+}
+
+const logoutBtn=document.getElementById('logout-btn')
+if(logoutBtn){
+  logoutBtn.addEventListener('click',async()=>{
+    try{await fetch('/api/auth/logout',{method:'POST'})}catch(_){/* ignore */}
+    location.href='index.html'
+  })
 }
 
 initUser()

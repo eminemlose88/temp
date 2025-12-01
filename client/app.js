@@ -49,23 +49,21 @@ form.addEventListener('submit',async e=>{
       }
       setError(msg);return
     }
-    sessionStorage.setItem('auth_token',j.data.token)
-    sessionStorage.setItem('current_user',u)
     location.href = 'dashboard.html'
   }catch(err){setError('登录失败，请稍后重试')}
 })
 
-const token = sessionStorage.getItem('auth_token')
-if(token){
+{
   let lastActive = Date.now()
   const markActive = ()=>{lastActive=Date.now()}
   ;['click','keydown','mousemove','touchstart'].forEach(evt=>window.addEventListener(evt,markActive,{passive:true}))
   setInterval(async()=>{
     const idle = Date.now()-lastActive
     if(idle>10*60*1000){
-      sessionStorage.removeItem('auth_token');location.href='index.html';
+      try{await fetch('/api/auth/logout',{method:'POST'})}catch(_){}
+      location.href='index.html';
       return
     }
-    try{await fetch('/api/auth/ping',{headers:{Authorization:'Bearer '+token}})}catch(_){}
+    try{await fetch('/api/auth/ping')}catch(_){}
   },60*1000)
 }

@@ -1,7 +1,7 @@
 import { getRedis } from '../_lib/redis.js'
-import { createSession } from '../_lib/auth.js'
+import { createSession, setSessionCookie } from '../_lib/auth.js'
 import bcrypt from 'bcryptjs'
-import { supabasePasswordSignIn } from '../_lib/supabase.js'
+import { supabasePasswordSignIn } from '../__lib/supabase.js'
 
 export default async function handler(req,res){
   if(req.method!=='POST') return res.status(405).json({ok:false,error:'method'})
@@ -24,10 +24,12 @@ export default async function handler(req,res){
     await r.set(`userByAccount:${account}`,String(nid))
     uid=String(nid)
   }
-  const token = await createSession({uid, sbAccess: sb.access_token, sbRefresh: sb.refresh_token, sbUserId: sb.user?.id||''})
+  const ttlSec = 60*60*24*7
+  const token = await createSession({uid, sbAccess: sb.access_token, sbRefresh: sb.refresh_token, sbUserId: sb.user?.id||''}, ttlSec)
   const data = await r.hGetAll(`user:${uid}`)
   const user = { id: String(uid), account: data.account, name: data.name||account, createdAt: Number(data.createdAt||0), sbUserId: sb.user?.id||'' }
   // 在 Redis 中缓存用户资料 10 分钟
   await r.set(`cache:user:${uid}`, JSON.stringify(user), { EX: 60*10 })
+  setSessionCookie(res, token, ttlSec)
   res.status(200).json({ok:true,data:{token,user}})
 }

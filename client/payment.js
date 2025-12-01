@@ -15,10 +15,8 @@ function initDepositPage(){
     const method=document.querySelector('input[name="pay"]:checked').value
     const amount=parseInt(document.getElementById('amount').value,10)
     if(!amount||amount<1000){err.textContent='请输入不低于 1000 的金额';return}
-    const token=sessionStorage.getItem('auth_token')
     try{
-      if(!token){err.textContent='请先登录';return}
-      const r=await fetch('/api/tips/create',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({amount,method,currency:'KRW'})})
+      const r=await fetch('/api/tips/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount,method,currency:'KRW'})})
       const j=await r.json()
       if(j&&j.ok){alert('入金记录已创建');renderRecentDeposits(recent)} else { err.textContent=j.error||'创建失败' }
     }catch(e){ err.textContent='网络错误，请稍后重试' }
@@ -27,10 +25,8 @@ function initDepositPage(){
 
 async function renderRecentDeposits(container){
   container.innerHTML=''
-  const token=sessionStorage.getItem('auth_token')
-  if(!token){container.textContent='请登录后查看';return}
   try{
-    const r=await fetch('/api/tips/my',{headers:{Authorization:'Bearer '+token}})
+    const r=await fetch('/api/tips/my')
     const j=await r.json()
     const arr=(j&&j.ok&&j.data&&j.data.tips)||[]
     arr.slice(0,5).forEach(r=>{
@@ -40,7 +36,7 @@ async function renderRecentDeposits(container){
       line.textContent=`#${r.id} · ${money(r.amount)} KRW · ${(r.method||'').toString().toUpperCase()} · ${when} · ${r.status||''}`
       container.append(line)
     })
-  }catch(_){container.textContent='加载失败'}
+  }catch(_){container.textContent='请登录后查看'}
 }
 
 function initWithdrawPage(){
@@ -54,11 +50,9 @@ function initWithdrawPage(){
     const account=document.getElementById('bank-account').value.trim()
     if(!amount||amount<1000){err.textContent='请输入不低于 1000 的金额';return}
     if(!bank||!holder||!account){err.textContent='请完整填写银行信息';return}
-    const token=sessionStorage.getItem('auth_token')
-    if(!token){err.textContent='请先登录';return}
     try{
       const reference=JSON.stringify({bank,holder,account})
-      const r=await fetch('/api/tips/create',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({amount,method:'bank',currency:'KRW',reference})})
+      const r=await fetch('/api/tips/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount,method:'bank',currency:'KRW',reference})})
       const j=await r.json()
       if(j&&j.ok){alert('出金申请已提交');} else {err.textContent=j.error||'提交失败'}
     }catch(_){err.textContent='网络错误，请稍后重试'}
@@ -72,10 +66,8 @@ function initRecordsPage(){
   async function renderDeposits(){
     btnD.classList.add('active');btnW.classList.remove('active')
     list.innerHTML=''
-    const token=sessionStorage.getItem('auth_token')
-    if(!token){list.textContent='请登录后查看';return}
     let items=[]
-    try{const r=await fetch('/api/tips/my',{headers:{Authorization:'Bearer '+token}});const j=await r.json();if(j&&j.ok){items=j.data.tips||[]}}catch(_){items=[]}
+    try{const r=await fetch('/api/tips/my');const j=await r.json();if(j&&j.ok){items=j.data.tips||[]}}catch(_){items=[]}
     items.forEach(r=>{
       const item=document.createElement('div');item.className='menu-item'
       const when=r.createdAt?new Date(r.createdAt).toLocaleString():''
