@@ -50,4 +50,3 @@ cBtn.onclick=async()=>{
   const data=await api('/api/tips/confirm',{method:'POST',headers:{Authorization:'Bearer '+getKey()},body:{id}})
   if(data.ok){cMsg.textContent=`已标记：${id} -> ${data.data.status}`} else {cMsg.textContent='操作失败'}
 }
-

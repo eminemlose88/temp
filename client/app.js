@@ -25,7 +25,7 @@ toggleBtn.addEventListener('click',()=>{
   else{passwordEl.type='password';toggleBtn.textContent='显示'}
 })
 
-signupLink.addEventListener('click',e=>{e.preventDefault();alert('请联系管理员开通或稍后上线注册功能')})
+if(signupLink){signupLink.addEventListener('click',e=>{})}
 
 const savedUser = localStorage.getItem('remember_user')
 if(savedUser){usernameEl.value = savedUser;rememberEl.checked = true}
@@ -39,12 +39,34 @@ form.addEventListener('submit',async e=>{
   const p = passwordEl.value
   if(rememberEl.checked){localStorage.setItem('remember_user',u)} else {localStorage.removeItem('remember_user')}
   try{
-    await new Promise(r=>setTimeout(r,600))
-    const ok = (u==='admin@example.com'&&p==='123456')||(u==='+8613800138000'&&p==='123456')
-    if(!ok){setError('账号或密码错误');return}
+    console.log('[login] submitting to /api/auth/login')
+    const r = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({account:u,password:p})})
+    const j = await r.json()
+    if(!j.ok){
+      const e = String(j.error||'')
+      let msg = e||'账号或密码错误'
+      if(e.includes('supabase error 400')||/invalid/i.test(e)||/not\s*confirmed/i.test(e)){
+        msg = '账号或密码错误或邮箱未验证'
+      }
+      setError(msg);return
+    }
+    localStorage.setItem('auth_token',j.data.token)
     localStorage.setItem('current_user',u)
-    try{fetch('/api/users/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:u,name:u})}).catch(()=>{})}catch(_){ }
     location.href = 'dashboard.html'
   }catch(err){setError('登录失败，请稍后重试')}
 })
 
+const token = localStorage.getItem('auth_token')
+if(token){
+  let lastActive = Date.now()
+  const markActive = ()=>{lastActive=Date.now()}
+  ;['click','keydown','mousemove','touchstart'].forEach(evt=>window.addEventListener(evt,markActive,{passive:true}))
+  setInterval(async()=>{
+    const idle = Date.now()-lastActive
+    if(idle>10*60*1000){
+      localStorage.removeItem('auth_token');location.href='index.html';
+      return
+    }
+    try{await fetch('/api/auth/ping',{headers:{Authorization:'Bearer '+token}})}catch(_){}
+  },60*1000)
+}

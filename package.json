@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "python -m http.server 5173",
+    "dev": "python -m http.server 5173 --directory client",
     "vercel:env:pull": "vercel env pull .env.development.local",
     "redis:test": "node scripts/redis-test.mjs"
   },
@@ -14,4 +14,3 @@
     "bcryptjs": "^2.4.3"
   }
 }
-
