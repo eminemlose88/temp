@@ -36,3 +36,18 @@ if(logoutBtn){
 
 initUser()
 switchTab('home')
+
+async function loadImages(){
+  try{
+    const b = await fetch('/api/images/list?prefix=banners/').then(r=>r.json()).catch(()=>null)
+    const p = await fetch('/api/images/list?prefix=profiles/').then(r=>r.json()).catch(()=>null)
+    const bannerImg = document.querySelector('#tab-home .banner img')
+    const burl = b&&b.ok&&b.data&&b.data.blobs&&b.data.blobs[0]&&b.data.blobs[0].url
+    if(burl&&bannerImg) bannerImg.src = burl
+    const imgs = Array.from(document.querySelectorAll('.profile-card .profile-img'))
+    const plist = p&&p.ok&&p.data&&p.data.blobs||[]
+    imgs.forEach((img,i)=>{ const u = plist[i]&&plist[i].url; if(u) img.src = u })
+  }catch(_){/* */}
+}
+
+loadImages()
