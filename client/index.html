@@ -48,5 +48,8 @@
     </footer>
   </div>
   <script src="app.js?v=login-supabase-2"></script>
+  <script>
+    (async()=>{ try{ const r=await fetch('/api/auth/me'); if(r.status===200){ location.href='dashboard.html' } }catch(_){} })()
+  </script>
 </body>
 </html>
