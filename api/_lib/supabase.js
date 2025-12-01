@@ -15,7 +15,13 @@ export async function supabasePasswordSignIn(email, password){
   let data
   try{ data = await res.json() }catch(_){ data = null }
   if(!res.ok){
-    const msg = (data && (data.error_description||data.error)) || `supabase error ${res.status}`
+    let msg = (data && (data.error_description||data.error)) || `supabase error ${res.status}`
+    if(!data){
+      try{
+        const txt = await res.text()
+        if(txt) msg = `${msg}: ${txt.slice(0,200)}`
+      }catch(_){/* ignore */}
+    }
     throw new Error(msg)
   }
   return data
