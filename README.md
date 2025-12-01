@@ -51,3 +51,36 @@ git branch -M main
 ## GitHub Pages（可选）
 - 仓库 Settings → Pages → Source 选择 `GitHub Actions`，使用静态站点部署工作流；或选择 `Deploy from a branch`，分支选 `main`，目录选 `/root`。
 
+## 打赏后台与 Vercel KV
+
+### 目录
+- API 目录：`/api`（Vercel Serverless）
+- 管理后台：`admin.html` + `admin.js`
+
+### 环境变量
+- `KV_REST_API_URL`、`KV_REST_API_TOKEN`：Vercel KV 提供
+- `ADMIN_API_KEY`：自定义管理密钥，用于确认到账接口
+
+### 初始化本地环境变量
+```bash
+npm i -g vercel
+vercel login
+vercel link
+vercel env pull .env.development.local
+```
+在 Vercel 项目 Settings → Environment Variables 中添加：
+- `KV_REST_API_URL`、`KV_REST_API_TOKEN`
+- `ADMIN_API_KEY`（任意安全随机字符串）
+
+### 核心接口
+- `POST /api/users/connect` 记录用户连接 `{ userId, name }`
+- `POST /api/tips/create` 新建打赏 `{ userId, amount, currency, method, reference? }`
+- `POST /api/tips/confirm` 标记到账（需 `Authorization: Bearer ADMIN_API_KEY`）
+- `GET  /api/tips/by-user?userId=...` 获取某用户订单与合计
+- `GET  /api/tips/summary` 总账与用户数
+- `GET  /api/tips/status?id=...` 查询单笔状态
+
+### 安全
+- 管理端操作通过 `ADMIN_API_KEY` 鉴权，前端仅在 `admin.html` 中使用。
+- 金额与用户的关联以 `tip:<id>` 存储，用户索引保存在 `user_tips:<userId>`，总账累加在 `tips:total`。
+

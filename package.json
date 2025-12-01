@@ -1,0 +1,14 @@
+{
+  "name": "noblesse-site",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "python -m http.server 5173",
+    "vercel:env:pull": "vercel env pull .env.development.local"
+  },
+  "dependencies": {
+    "@vercel/kv": "^1.0.0"
+  }
+}
+

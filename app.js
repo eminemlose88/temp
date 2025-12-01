@@ -43,6 +43,7 @@ form.addEventListener('submit',async e=>{
     const ok = (u==='admin@example.com'&&p==='123456')||(u==='+8613800138000'&&p==='123456')
     if(!ok){setError('账号或密码错误');return}
     localStorage.setItem('current_user',u)
+    try{fetch('/api/users/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:u,name:u})}).catch(()=>{})}catch(_){ }
     location.href = 'dashboard.html'
   }catch(err){setError('登录失败，请稍后重试')}
 })
