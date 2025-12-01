@@ -14,15 +14,6 @@ export async function getSessionUserId(req){
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : ''
   if(!token) return null
   const r = await getRedis()
-  const uid = await r.get(`session:${token}`)
-  return uid
-}
-
-export async function getSessionUserId(req){
-  const auth = req.headers['authorization']||''
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : ''
-  if(!token) return null
-  const r = await getRedis()
   const raw = await r.get(`session:${token}`)
   if(!raw) return null
   try{ const obj=JSON.parse(raw); return obj.uid||obj.userId||null }catch{ return raw }
@@ -46,5 +37,15 @@ export async function getSession(req){
   if(!raw) return null
   try{ return JSON.parse(raw) }catch{ return { uid: raw } }
 }
+
+export async function touchSession(req, ttlSec=60*10){
+  const auth = req.headers['authorization']||''
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : ''
+  if(!token) return false
+  const r = await getRedis()
+  const key = `session:${token}`
+  const raw = await r.get(key)
+  if(!raw) return false
+  await r.expire(key, ttlSec)
   return true
 }
