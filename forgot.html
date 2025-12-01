@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>找回密码</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <h1 class="title">找回密码</h1>
+      <p class="subtitle">输入您的邮箱或手机号，我们将发送重置指引</p>
+      <form class="form" id="reset-form">
+        <div class="field">
+          <label for="account">账号</label>
+          <input id="account" type="text" placeholder="邮箱或手机号" required>
+        </div>
+        <button class="btn" type="submit">发送重置链接</button>
+      </form>
+      <div class="divider">
+        <a href="index.html" class="link">返回登录</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    const f=document.getElementById('reset-form')
+    f.addEventListener('submit',e=>{e.preventDefault();alert('重置邮件已发送，如未收到请稍后重试')})
+  </script>
+</body>
+</html>
+

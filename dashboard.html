@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Noblesse App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app">
+  <header class="topbar">
+    <div class="top-left">
+      <img src="assets/logo.svg" class="top-logo" alt="logo">
+      <span class="brand-small">Noblesse</span>
+    </div>
+    <div class="top-right">
+      <span class="ico">🔔</span>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <section id="tab-home" class="tab active">
+      <div class="banner">
+        <div class="banner-text">
+          <div class="banner-title">欢迎加入 Noblesse</div>
+          <div class="banner-sub">专属服务与高端体验</div>
+        </div>
+      </div>
+      <div class="notice">
+        <span class="ico">🔊</span>
+        <div class="notice-text">欢迎来到 Noblesse 俱乐部！超过 100,000 名会员正在使用</div>
+        <a class="chip ghost" href="#">更多</a>
+      </div>
+
+      <div class="quick-grid">
+        <a class="quick" data-goto="events"><span class="quick-ico">🎉</span><span>活动</span></a>
+        <a class="quick" href="#"><span class="quick-ico">📰</span><span>新闻</span></a>
+        <a class="quick" data-goto="videos"><span class="quick-ico">▶️</span><span>视频</span></a>
+        <a class="quick" data-goto="profiles"><span class="quick-ico">👑</span><span>资料</span></a>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title"><span class="dot"></span> 人气城市</div>
+        <div class="city-grid">
+          <span class="chip">서울</span>
+          <span class="chip">경기도</span>
+          <span class="chip">강원도</span>
+          <span class="chip">충청북도</span>
+          <span class="chip">충청남도</span>
+          <span class="chip">경상북도</span>
+          <span class="chip">전라북도</span>
+          <span class="chip">경상남도</span>
+          <span class="chip">전라남도</span>
+          <span class="chip">제주도</span>
+          <a class="chip ghost" href="#">+ 更多</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-profiles" class="tab">
+      <h2 class="tab-title">经理人资料</h2>
+      <div class="profiles-grid" id="profiles-grid"></div>
+    </section>
+
+    <section id="tab-events" class="tab">
+      <div class="overlay" id="events-loading">
+        <div class="heart">❤</div>
+        <div class="overlay-text">加载中...</div>
+      </div>
+    </section>
+
+    <section id="tab-videos" class="tab">
+      <h2 class="tab-title">视频剧场</h2>
+      <div class="filters">
+        <span class="chip active">全部</span>
+        <span class="chip">热门</span>
+        <span class="chip">精选</span>
+      </div>
+      <div class="video-list" id="video-list"></div>
+    </section>
+
+    <section id="tab-mypage" class="tab">
+      <div class="mypage">
+        <div class="profile-header">
+          <div class="avatar">U</div>
+          <div class="pinfo">
+            <div class="pname" id="pname">用户</div>
+            <div class="pid" id="pid">NO.000000</div>
+          </div>
+        </div>
+        <div class="wallet">
+          <div class="wallet-item"><div class="w-title">钻石</div><div class="w-num">0</div></div>
+          <div class="wallet-item"><div class="w-title">奖励个数</div><div class="w-num">0</div></div>
+        </div>
+        <div class="menu-list">
+          <a class="menu-item" href="#">入金中心</a>
+          <a class="menu-item" href="#">出金中心</a>
+          <a class="menu-item" href="#">订单记录</a>
+          <a class="menu-item" href="#">入金记录</a>
+          <a class="menu-item" href="#">出金记录</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <a class="nav-item active" data-tab="home">首页</a>
+    <a class="nav-item" data-tab="profiles">经理人资料</a>
+    <a class="nav-item" data-tab="events">活动</a>
+    <a class="nav-item" data-tab="videos">视频</a>
+    <a class="nav-item" data-tab="mypage">我的</a>
+  </nav>
+
+  <script src="app-dashboard.js"></script>
+</body>
+</html>
+
