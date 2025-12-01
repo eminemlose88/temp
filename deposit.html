@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>入金中心</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app">
+  <header class="topbar">
+    <div class="top-left"><a class="link" href="dashboard.html">返回</a></div>
+    <div>入金中心</div>
+    <div style="width:40px"></div>
+  </header>
+  <main class="app-content">
+    <div class="card" style="padding:16px">
+      <div class="title" style="margin-bottom:10px">选择方式</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <label class="chip"><input type="radio" name="pay" value="kakao" checked style="margin-right:6px">KakaoPay</label>
+        <label class="chip"><input type="radio" name="pay" value="card" style="margin-right:6px">信用卡</label>
+      </div>
+
+      <form id="deposit-form" class="form" style="margin-top:14px">
+        <div class="field">
+          <label for="amount">金额（KRW）</label>
+          <input id="amount" type="number" placeholder="最低 1000" min="1000" step="1000" required>
+        </div>
+
+        <div id="card-fields" style="display:none">
+          <div class="field">
+            <label for="card-number">卡号</label>
+            <input id="card-number" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000">
+          </div>
+          <div style="display:flex;gap:10px">
+            <div class="field" style="flex:1">
+              <label for="card-exp">有效期</label>
+              <input id="card-exp" type="text" placeholder="MM/YY">
+            </div>
+            <div class="field" style="flex:1">
+              <label for="card-cvc">CVC</label>
+              <input id="card-cvc" type="password" maxlength="4" placeholder="***">
+            </div>
+          </div>
+        </div>
+
+        <div id="kakao-fields">
+          <div class="notice"><span class="ico">⚠</span><div class="notice-text">将跳转至 KakaoPay 模拟支付</div></div>
+        </div>
+
+        <div id="deposit-error" class="error"></div>
+        <button class="btn" type="submit">确认入金</button>
+      </form>
+    </div>
+
+    <div class="section-card" style="margin-top:16px">
+      <div class="section-title"><span class="dot"></span> 最近入金</div>
+      <div id="recent-deposits"></div>
+    </div>
+  </main>
+  <script src="payment.js"></script>
+  <script>
+    initDepositPage()
+  </script>
+</body>
+</html>
+

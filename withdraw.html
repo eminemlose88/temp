@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>出金中心</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app">
+  <header class="topbar">
+    <div class="top-left"><a class="link" href="dashboard.html">返回</a></div>
+    <div>出金中心</div>
+    <div style="width:40px"></div>
+  </header>
+  <main class="app-content">
+    <div class="card" style="padding:16px">
+      <div class="title" style="margin-bottom:10px">提现方式</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <label class="chip"><input type="radio" name="wd" value="bank" checked style="margin-right:6px">银行转账</label>
+      </div>
+      <form id="withdraw-form" class="form" style="margin-top:14px">
+        <div class="field">
+          <label for="wd-amount">金额（KRW）</label>
+          <input id="wd-amount" type="number" placeholder="最低 1000" min="1000" step="1000" required>
+        </div>
+        <div class="field">
+          <label for="bank-name">银行</label>
+          <input id="bank-name" type="text" placeholder="例如 KEB Hana" required>
+        </div>
+        <div class="field">
+          <label for="bank-holder">户名</label>
+          <input id="bank-holder" type="text" placeholder="收款人姓名" required>
+        </div>
+        <div class="field">
+          <label for="bank-account">账号</label>
+          <input id="bank-account" type="text" placeholder="账号" required>
+        </div>
+        <div id="withdraw-error" class="error"></div>
+        <button class="btn" type="submit">提交申请</button>
+      </form>
+    </div>
+  </main>
+  <script src="payment.js"></script>
+  <script>
+    initWithdrawPage()
+  </script>
+</body>
+</html>
+

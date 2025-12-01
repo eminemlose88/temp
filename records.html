@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>入金/出金记录</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app">
+  <header class="topbar">
+    <div class="top-left"><a class="link" href="dashboard.html">返回</a></div>
+    <div>记录</div>
+    <div style="width:40px"></div>
+  </header>
+  <main class="app-content">
+    <div class="filters">
+      <button class="chip active" id="btn-deposits">入金记录</button>
+      <button class="chip" id="btn-withdraws">出金记录</button>
+    </div>
+    <div id="list"></div>
+  </main>
+  <script src="payment.js"></script>
+  <script>
+    initRecordsPage()
+  </script>
+</body>
+</html>
+
