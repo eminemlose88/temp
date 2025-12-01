@@ -23,12 +23,108 @@
   <main class="app-content">
     <section id="tab-home" class="tab active">
       <div class="banner">
+        <img src="assets/placeholder.svg" alt="banner" class="profile-img" style="height:180px">
         <div class="banner-text">
-          <div class="banner-title">欢迎加入 Noblesse</div>
-          <div class="banner-sub">专属服务与高端体验</div>
+          <div class="banner-title">Noblesse VIP</div>
+          <div class="banner-sub">只为你呈现的品质与风格</div>
         </div>
       </div>
-      <div class="notice"><span class="ico">🔊</span><div class="notice-text">欢迎使用移动端服务中心</div></div>
+      <div class="notice"><span class="ico">🔊</span><div class="notice-text">欢迎来到 Noblesse 俱乐部</div></div>
+
+      <div class="quick-grid">
+        <a class="quick" href="deposit.html">
+          <div class="quick-ico">💎</div>
+          <div>入金中心</div>
+        </a>
+        <a class="quick" href="withdraw.html">
+          <div class="quick-ico">💳</div>
+          <div>出金中心</div>
+        </a>
+        <a class="quick" href="records.html">
+          <div class="quick-ico">📜</div>
+          <div>订单记录</div>
+        </a>
+        <a class="quick" href="admin.html">
+          <div class="quick-ico">🎛️</div>
+          <div>管理后台</div>
+        </a>
+      </div>
+
+      <div class="section-card" style="margin-top:12px">
+        <div class="section-title"><span class="dot"></span> 热门城市</div>
+        <div class="city-grid">
+          <span class="chip">首尔</span>
+          <span class="chip">京畿道</span>
+          <span class="chip">釜山</span>
+          <span class="chip">仁川</span>
+          <span class="chip">大邱</span>
+          <span class="chip">济州</span>
+        </div>
+      </div>
+
+      <div class="section-card" style="margin-top:12px">
+        <div class="section-title"><span class="dot"></span> 管理者精选</div>
+        <div class="profiles-grid">
+          <div class="profile-card">
+            <img src="assets/placeholder.svg" alt="profile" class="profile-img">
+            <div class="badge">认证</div>
+            <div class="p-meta"><div class="p-name">示例 A</div><div class="rate">❤ 9.6</div></div>
+          </div>
+          <div class="profile-card">
+            <img src="assets/placeholder.svg" alt="profile" class="profile-img">
+            <div class="badge">认证</div>
+            <div class="p-meta"><div class="p-name">示例 B</div><div class="rate">❤ 9.5</div></div>
+          </div>
+          <div class="profile-card">
+            <img src="assets/placeholder.svg" alt="profile" class="profile-img">
+            <div class="badge">认证</div>
+            <div class="p-meta"><div class="p-name">示例 C</div><div class="rate">❤ 9.4</div></div>
+          </div>
+          <div class="profile-card">
+            <img src="assets/placeholder.svg" alt="profile" class="profile-img">
+            <div class="badge">认证</div>
+            <div class="p-meta"><div class="p-name">示例 D</div><div class="rate">❤ 9.7</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-events" class="tab"></section>
+      <div class="section-card">
+        <div class="section-title"><span class="dot"></span> 活动与新闻</div>
+        <div class="filters">
+          <span class="chip active">最新</span>
+          <span class="chip">公告</span>
+          <span class="chip">优惠</span>
+        </div>
+        <div class="menu-list">
+          <div class="menu-item">本周专属优惠上线</div>
+          <div class="menu-item">服务升级维护通知</div>
+          <div class="menu-item">会员里程规则更新</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-videos" class="tab">
+      <div class="section-card">
+        <div class="section-title"><span class="dot"></span> 视频精选</div>
+        <div class="video-list">
+          <div class="video-item">
+            <div class="video-thumb"></div>
+            <div class="video-body">
+              <div class="tag chip">热门</div>
+              <div>品质生活片段</div>
+            </div>
+          </div>
+          <div class="video-item">
+            <div class="video-thumb"></div>
+            <div class="video-body">
+              <div class="tag chip">推荐</div>
+              <div>服务场景巡礼</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
 
@@ -59,6 +155,8 @@
 
   <nav class="bottom-nav">
     <a class="nav-item active" data-tab="home">首页</a>
+    <a class="nav-item" data-tab="events">活动</a>
+    <a class="nav-item" data-tab="videos">视频</a>
     <a class="nav-item" data-tab="mypage">我的</a>
   </nav>
 

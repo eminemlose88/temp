@@ -1,5 +1,7 @@
 const tabs = {
   home: document.getElementById('tab-home'),
+  events: document.getElementById('tab-events'),
+  videos: document.getElementById('tab-videos'),
   mypage: document.getElementById('tab-mypage')
 }
 const navItems = Array.from(document.querySelectorAll('.nav-item'))
