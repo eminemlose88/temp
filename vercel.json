@@ -3,10 +3,5 @@
     "api/**.js": {
       "runtime": "nodejs18.x"
     }
-  },
-  "excludeFiles": [
-    "admin-system/**",
-    "api/redis/**"
-  ]
+  }
 }
-
