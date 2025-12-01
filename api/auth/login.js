@@ -1,7 +1,7 @@
 import { getRedis } from '../_lib/redis.js'
 import { createSession, setSessionCookie } from '../_lib/auth.js'
 import bcrypt from 'bcryptjs'
-import { supabasePasswordSignIn } from '../__lib/supabase.js'
+import { supabasePasswordSignIn } from '../_lib/supabase.js'
 
 export default async function handler(req,res){
   if(req.method!=='POST') return res.status(405).json({ok:false,error:'method'})
