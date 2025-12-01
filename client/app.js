@@ -27,8 +27,7 @@ toggleBtn.addEventListener('click',()=>{
 
 if(signupLink){signupLink.addEventListener('click',e=>{})}
 
-const savedUser = localStorage.getItem('remember_user')
-if(savedUser){usernameEl.value = savedUser;rememberEl.checked = true}
+const savedUser = null
 
 form.addEventListener('submit',async e=>{
   e.preventDefault()
@@ -37,7 +36,7 @@ form.addEventListener('submit',async e=>{
   if(msg){setError(msg);return}
   const u = usernameEl.value.trim()
   const p = passwordEl.value
-  if(rememberEl.checked){localStorage.setItem('remember_user',u)} else {localStorage.removeItem('remember_user')}
+  if(rememberEl.checked){}
   try{
     console.log('[login] submitting to /api/auth/login')
     const r = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({account:u,password:p})})
@@ -50,13 +49,13 @@ form.addEventListener('submit',async e=>{
       }
       setError(msg);return
     }
-    localStorage.setItem('auth_token',j.data.token)
-    localStorage.setItem('current_user',u)
+    sessionStorage.setItem('auth_token',j.data.token)
+    sessionStorage.setItem('current_user',u)
     location.href = 'dashboard.html'
   }catch(err){setError('登录失败，请稍后重试')}
 })
 
-const token = localStorage.getItem('auth_token')
+const token = sessionStorage.getItem('auth_token')
 if(token){
   let lastActive = Date.now()
   const markActive = ()=>{lastActive=Date.now()}
@@ -64,7 +63,7 @@ if(token){
   setInterval(async()=>{
     const idle = Date.now()-lastActive
     if(idle>10*60*1000){
-      localStorage.removeItem('auth_token');location.href='index.html';
+      sessionStorage.removeItem('auth_token');location.href='index.html';
       return
     }
     try{await fetch('/api/auth/ping',{headers:{Authorization:'Bearer '+token}})}catch(_){}

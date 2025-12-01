@@ -9,10 +9,9 @@ const tipId=document.getElementById('tip-id')
 const cBtn=document.getElementById('confirm-tip')
 const cMsg=document.getElementById('confirm-msg')
 
-function getKey(){return localStorage.getItem('admin_key')||''}
-function setKey(v){localStorage.setItem('admin_key',v)}
-keyEl.value=getKey()
-saveBtn.onclick=()=>{setKey(keyEl.value);alert('已保存')}
+function getKey(){return keyEl.value.trim()}
+keyEl.value=''
+saveBtn.onclick=()=>{alert('密钥仅用于本次会话，不做本地保存')}
 
 async function api(path,opts={}){
   const headers=Object.assign({'Content-Type':'application/json'},opts.headers||{})
@@ -47,6 +46,7 @@ cBtn.onclick=async()=>{
   cMsg.textContent=''
   const id=tipId.value.trim()
   if(!id) return
-  const data=await api('/api/tips/confirm',{method:'POST',headers:{Authorization:'Bearer '+getKey()},body:{id}})
+  const key=getKey()
+  const data=await api('/api/tips/confirm',{method:'POST',headers:{Authorization:'Bearer '+key},body:{id}})
   if(data.ok){cMsg.textContent=`已标记：${id} -> ${data.data.status}`} else {cMsg.textContent='操作失败'}
 }

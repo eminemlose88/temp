@@ -1,9 +1,3 @@
-function id(){return Math.random().toString(36).slice(2,10)}
-function now(){const d=new Date();return d.toISOString()}
-function read(key){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return []}}
-function write(key,val){localStorage.setItem(key,JSON.stringify(val))}
-function addDeposit(rec){const arr=read('deposit_records');arr.unshift(rec);write('deposit_records',arr)}
-function addWithdraw(rec){const arr=read('withdraw_records');arr.unshift(rec);write('withdraw_records',arr)}
 function money(n){return new Intl.NumberFormat('ko-KR').format(n)}
 function createRow(title,right,muted){const row=document.createElement('div');row.className='menu-item';const a=document.createElement('div');a.textContent=title;const b=document.createElement('div');b.textContent=right;b.style.float='right';b.style.color=muted?'var(--muted)':'var(--text)';row.append(a);row.append(b);return row}
 
@@ -21,36 +15,38 @@ function initDepositPage(){
     const method=document.querySelector('input[name="pay"]:checked').value
     const amount=parseInt(document.getElementById('amount').value,10)
     if(!amount||amount<1000){err.textContent='请输入不低于 1000 的金额';return}
-    const token=localStorage.getItem('auth_token')
+    const token=sessionStorage.getItem('auth_token')
     try{
-      const r=await fetch('/api/tips/create',{method:'POST',headers:{'Content-Type':'application/json',Authorization: token?('Bearer '+token):undefined},body:JSON.stringify({amount,method,currency:'KRW'})})
+      if(!token){err.textContent='请先登录';return}
+      const r=await fetch('/api/tips/create',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({amount,method,currency:'KRW'})})
       const j=await r.json()
-      if(j&&j.ok){alert('入金记录已创建');renderRecentDeposits(recent)} else {
-        const rec={id:id(),time:now(),amount,method,status:'Pending'}
-        addDeposit(rec);setTimeout(()=>{rec.status='Completed';addDeposit(rec);renderRecentDeposits(recent);alert('入金成功：'+money(amount)+' KRW')},800)
-      }
-    }catch(_){
-      const rec={id:id(),time:now(),amount,method,status:'Pending'}
-      addDeposit(rec);setTimeout(()=>{rec.status='Completed';addDeposit(rec);renderRecentDeposits(recent);alert('入金成功：'+money(amount)+' KRW')},800)
-    }
+      if(j&&j.ok){alert('入金记录已创建');renderRecentDeposits(recent)} else { err.textContent=j.error||'创建失败' }
+    }catch(e){ err.textContent='网络错误，请稍后重试' }
   })
 }
 
-function renderRecentDeposits(container){
-  const arr=read('deposit_records').slice(0,5)
+async function renderRecentDeposits(container){
   container.innerHTML=''
-  arr.forEach(r=>{
-    const line=document.createElement('div')
-    line.className='menu-item'
-    line.textContent=`#${r.id} · ${money(r.amount)} KRW · ${r.method.toUpperCase()} · ${r.status}`
-    container.append(line)
-  })
+  const token=sessionStorage.getItem('auth_token')
+  if(!token){container.textContent='请登录后查看';return}
+  try{
+    const r=await fetch('/api/tips/my',{headers:{Authorization:'Bearer '+token}})
+    const j=await r.json()
+    const arr=(j&&j.ok&&j.data&&j.data.tips)||[]
+    arr.slice(0,5).forEach(r=>{
+      const line=document.createElement('div')
+      line.className='menu-item'
+      const when=r.createdAt?new Date(r.createdAt).toLocaleString():''
+      line.textContent=`#${r.id} · ${money(r.amount)} KRW · ${(r.method||'').toString().toUpperCase()} · ${when} · ${r.status||''}`
+      container.append(line)
+    })
+  }catch(_){container.textContent='加载失败'}
 }
 
 function initWithdrawPage(){
   const form=document.getElementById('withdraw-form')
   const err=document.getElementById('withdraw-error')
-  form.addEventListener('submit',e=>{
+  form.addEventListener('submit',async e=>{
     e.preventDefault();err.textContent=''
     const amount=parseInt(document.getElementById('wd-amount').value,10)
     const bank=document.getElementById('bank-name').value.trim()
@@ -58,9 +54,14 @@ function initWithdrawPage(){
     const account=document.getElementById('bank-account').value.trim()
     if(!amount||amount<1000){err.textContent='请输入不低于 1000 的金额';return}
     if(!bank||!holder||!account){err.textContent='请完整填写银行信息';return}
-    const rec={id:id(),time:now(),amount,method:'bank',detail:{bank,holder,account},status:'Reviewing'}
-    addWithdraw(rec)
-    setTimeout(()=>{rec.status='Completed';addWithdraw(rec);alert('出金申请已完成：'+money(amount)+' KRW')},1000)
+    const token=sessionStorage.getItem('auth_token')
+    if(!token){err.textContent='请先登录';return}
+    try{
+      const reference=JSON.stringify({bank,holder,account})
+      const r=await fetch('/api/tips/create',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({amount,method:'bank',currency:'KRW',reference})})
+      const j=await r.json()
+      if(j&&j.ok){alert('出金申请已提交');} else {err.textContent=j.error||'提交失败'}
+    }catch(_){err.textContent='网络错误，请稍后重试'}
   })
 }
 
@@ -71,14 +72,13 @@ function initRecordsPage(){
   async function renderDeposits(){
     btnD.classList.add('active');btnW.classList.remove('active')
     list.innerHTML=''
-    const token=localStorage.getItem('auth_token')
+    const token=sessionStorage.getItem('auth_token')
+    if(!token){list.textContent='请登录后查看';return}
     let items=[]
-    if(token){
-      try{const r=await fetch('/api/tips/my',{headers:{Authorization:'Bearer '+token}});const j=await r.json();if(j&&j.ok){items=j.data.tips||[]}}catch(_){items=[]}
-    }
-    (items.length?items:read('deposit_records')).forEach(r=>{
+    try{const r=await fetch('/api/tips/my',{headers:{Authorization:'Bearer '+token}});const j=await r.json();if(j&&j.ok){items=j.data.tips||[]}}catch(_){items=[]}
+    items.forEach(r=>{
       const item=document.createElement('div');item.className='menu-item'
-      const when=r.time?new Date(r.time).toLocaleString():''
+      const when=r.createdAt?new Date(r.createdAt).toLocaleString():''
       item.textContent=`[入金] #${r.id} · ${money(r.amount)} KRW · ${(r.method||'').toString().toUpperCase()} · ${when} · ${r.status||''}`
       list.append(item)
     })
@@ -86,11 +86,7 @@ function initRecordsPage(){
   function renderWithdraws(){
     btnW.classList.add('active');btnD.classList.remove('active')
     list.innerHTML=''
-    read('withdraw_records').forEach(r=>{
-      const item=document.createElement('div');item.className='menu-item'
-      item.textContent=`[出金] #${r.id} · ${money(r.amount)} KRW · ${r.detail.bank} · ${new Date(r.time).toLocaleString()} · ${r.status}`
-      list.append(item)
-    })
+    list.textContent='请通过入金记录查看提交历史'
   }
   btnD.addEventListener('click',renderDeposits)
   btnW.addEventListener('click',renderWithdraws)

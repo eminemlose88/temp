@@ -15,7 +15,7 @@ navItems.forEach(n=>n.addEventListener('click',()=>switchTab(n.dataset.tab)))
 function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
 
 function initUser(){
-  const name=localStorage.getItem('current_user')||'用户'
+  const name=sessionStorage.getItem('current_user')||'用户'
   const pname=document.getElementById('pname')
   const pid=document.getElementById('pid')
   if(pname)pname.textContent=name
